@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
     EditText edit_ip;   //서버의 IP를 작성할 수 있는 EditText
     EditText edit_port;
     Button btn_connect;
-    String msg="";
-    boolean isConnected=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,55 +75,9 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                /*
-                //서버와 접속이 끊길 때까지 무한반복하면서 서버의 메세지 수신
-                while (isConnected) {
-                    try {
-                        msg = is.readUTF(); //서버부터 메세지가 전송되면 이를 UTF형식으로 읽어서 String으로 리턴
-                        runOnUiThread(() -> {
-                            text_msg.setText("Server : " + msg);
-                        });
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-               */
             }).start();
         }
     }
-    /*
-    public void SendMessage(View view) {
-        if(os==null) return;   //서버와 연결되어 있지 않다면 전송불가..
-
-        //네트워크 작업이므로 Thread 생성
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                //서버로 보낼 메세지 EditText로 부터 얻어오기
-                String msg= edit_msg.getText().toString();
-                try {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String msg= edit_msg.getText().toString();
-                            // TODO Auto-generated method stub
-                            text_msg.setText("Client : " +msg);
-                        }
-                    });
-                    os.writeUTF(msg);  //서버로 메세지 보내기.UTF 방식으로(한글 전송가능...)
-                    os.flush();        //다음 메세지 전송을 위해 연결통로의 버퍼를 지워주는 메소드..
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }//run method..
-
-        }).start(); //Thread 실행..
-    }
-    */
 
     @Override
     protected void onStop() {
