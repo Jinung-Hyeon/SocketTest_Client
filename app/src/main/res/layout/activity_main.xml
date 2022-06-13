@@ -21,40 +21,35 @@
         android:textAlignment="center"
         android:hint="서버 port번호를 입력하세요."/>
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="접속"
-        android:onClick="ClientSocketOpen"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="20dp"/>
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="30dp">
+
+        <Button
+            android:id="@+id/btn_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="접속종료"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/chatting"
         android:layout_width="match_parent"
         android:layout_height="400dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/msg"
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:hint="내용을 입력하세요"/>
-        <Button
-            android:id="@+id/connect"
-            android:onClick="SendMessage"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:text="전송"/>
 
-    </LinearLayout>
 
 
 
