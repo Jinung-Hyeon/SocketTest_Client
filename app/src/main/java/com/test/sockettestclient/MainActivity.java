@@ -1,5 +1,6 @@
 package com.test.sockettestclient;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,16 +24,19 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "test";
+    private static final String TAG = "simpleTest";
 
     //로컬 IP사용시 127.0.0.1로 ip 변경하기
-    private final String ip = "192.168.123.104";
-    private final String port = "5002";
+    private final String ip = "127.0.0.1";
+    //private final String ip = "10.0.2.16";  // 에뮬레이터 ip
+    private final String port = "5001";
+    int endSignal = 0;
 
     Socket socket;     //클라이언트의 소켓
-
+    Button btn_end;
     DataInputStream is;
     DataOutputStream os;
+
 
 
     @Override
@@ -39,7 +44,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ClientSocketOpen();
+        ActionBar ac = getSupportActionBar();
+        ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");
+
+        //btn_end = findViewById(R.id.btn_end);
+        ClientSocketOpen(endSignal);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        /*
+        btn_end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                endSignal = 1;
+                ClientSocketOpen(endSignal);
+            }
+        });
+        */
+
     }
 
 
@@ -56,30 +78,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void ClientSocketOpen() {
-
+    public void ClientSocketOpen(int endSignal) {
         if (ip.isEmpty() || port.isEmpty()) {
             Toast.makeText(MainActivity.this, "ip주소와 포트번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(MainActivity.this, "서버 접속완료", Toast.LENGTH_SHORT).show();
+            if(endSignal != 1) {
+                //Toast.makeText(MainActivity.this, "서버 접속완료", Toast.LENGTH_SHORT).show();
+            }
             new Thread((Runnable) () -> {
                 try {
                     //서버와 연결하는 소켓 생성
-                    socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
+                    if(endSignal == 0){
+                        socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 try {
                     //서버와 메세지를 주고받을 통로 구축
                     is = new DataInputStream(socket.getInputStream());
                     os = new DataOutputStream(socket.getOutputStream());
 
+                    if (endSignal == 1) {
+                        os.write(endSignal);
+                        os.flush();
+                        socket.close();
+                        moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                        finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+                        android.os.Process.killProcess(android.os.Process.myPid()); //앱 프로세스 종료
+                        Log.d(TAG, "signal: " + endSignal);
+                    }
 
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(MainActivity.this, "Connected With Server", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "\"스마트 AI 노인 돌봄시스템\"이 준비되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (IOException e) {
@@ -88,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
         }
     }
+
 
     @Override
     public boolean moveTaskToBack(boolean nonRoot) {
@@ -106,27 +140,30 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "homeKey: ");
     }
 
+    //다른 앱을 실행시켜주는 메소드
     public void getPackageList() {
-        //SDK30이상은 Manifest권한 추가가 필요 출처:https://inpro.tistory.com/214
-        PackageManager pkgMgr = getPackageManager();
-        List<ResolveInfo> mApps;
-        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        mApps = pkgMgr.queryIntentActivities(mainIntent, 0);
+        if(endSignal == 0){
+            //SDK30이상은 Manifest권한 추가가 필요 출처:https://inpro.tistory.com/214
+            PackageManager pkgMgr = getPackageManager();
+            List<ResolveInfo> mApps;
+            Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+            mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            mApps = pkgMgr.queryIntentActivities(mainIntent, 0);
 
-        try {
-            for (int i = 0; i < mApps.size(); i++) {
-                if(mApps.get(i).activityInfo.packageName.startsWith("com.test.sokettestserver")){
-                    Log.d("start", "실행시킴");
-                    break;
+            try {
+                for (int i = 0; i < mApps.size(); i++) {
+                    if(mApps.get(i).activityInfo.packageName.startsWith("com.test.sokettestserver")){
+                        Log.d("start", "실행시킴");
+                        break;
+                    }
                 }
+                Intent intent = getPackageManager().getLaunchIntentForPackage("com.test.sokettestserver");
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
-            Intent intent = getPackageManager().getLaunchIntentForPackage("com.test.sokettestserver");
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    } //getPackageList()
 }
