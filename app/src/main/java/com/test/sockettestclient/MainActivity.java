@@ -28,15 +28,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "simpleTest";
 
     //화면 킬 시간 변수
-    public static final int WAKEUP_HOUR = 4;
-    public static final int WAKEUP_MINIUTE = 42;
+    public static final int WAKEUP_HOUR = 8;
+    public static final int WAKEUP_MINIUTE = 16;
     public static final int WAKEUP_SECOND = 0;
     public static final int WAKEUP_MILISECOND = 0;
 
 
     //화면 끌 시간 변수
-    public static final int GOTOSLEEP_HOUR = 4;
-    public static final int GOTOSLEEP_MINIUTE = 43;
+    public static final int GOTOSLEEP_HOUR = 8;
+    public static final int GOTOSLEEP_MINIUTE = 17;
     public static final int GOTOSLEEP_SECOND = 0;
     public static final int GOTOSLEEP_MILISECOND = 0;
 
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         ClientSocketOpen(endSignal);
         try {
             overridePendingTransition(0,0);
@@ -74,17 +75,18 @@ public class MainActivity extends AppCompatActivity {
         //btn_end = findViewById(R.id.btn_end);
         //ClientSocketOpen(endSignal);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-        /*
-        btn_end.setOnClickListener(new View.OnClickListener() {
+
+
+/*        btn_end.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                endSignal = 1;
+                endSignal = 2;
                 ClientSocketOpen(endSignal);
             }
-        });
-        */
+        });*/
+
 
         Intent intent = getIntent();
         String wakeUpValue = intent.getStringExtra("KeepScreenOn");
@@ -135,8 +137,14 @@ public class MainActivity extends AppCompatActivity {
             new Thread((Runnable) () -> {
                 try {
                     //서버와 연결하는 소켓 생성
-                    if(endSignal == 0){
+                    if(endSignal == 0 && socket == null){
                         socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainActivity.this, "\"스마트 AI 노인 돌봄시스템\"이 준비되었습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -146,22 +154,17 @@ public class MainActivity extends AppCompatActivity {
                     is = new DataInputStream(socket.getInputStream());
                     os = new DataOutputStream(socket.getOutputStream());
 
-                    if (endSignal == 1) {
+                    if (endSignal == 2) {
                         os.write(endSignal);
                         os.flush();
-                        socket.close();
-                        moveTaskToBack(true); // 태스크를 백그라운드로 이동
-                        finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
-                        android.os.Process.killProcess(android.os.Process.myPid()); //앱 프로세스 종료
+                        //socket.close();
+                        //moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                        //finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+                        //android.os.Process.killProcess(android.os.Process.myPid()); //앱 프로세스 종료
                         Log.d(TAG, "signal: " + endSignal);
                     }
 
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(MainActivity.this, "\"스마트 AI 노인 돌봄시스템\"이 준비되었습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -183,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        getPackageList();
+        //getPackageList();
+        ClientSocketOpen(2);
         Log.d(TAG, "homeKey: ");
     }
 
@@ -217,7 +221,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Thread.interrupted();
         Log.e(TAG, "onPause!!");
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ClientSocketOpen(2);
     }
 }
