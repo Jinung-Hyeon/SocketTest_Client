@@ -50,6 +50,8 @@ public class Alarm extends BroadcastReceiver {
                     AlarmManager bootAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
                     AlarmManager.AlarmClockInfo bootAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), bootPendingIntent);
                     bootAlarmManager.setAlarmClock(bootAc, bootPendingIntent);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.putExtra("KeepScreenOn", "KeepScreenOn");
                     context.startActivity(i);
                     break;
                 case Intent.ACTION_SCREEN_ON:

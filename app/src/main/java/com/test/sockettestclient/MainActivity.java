@@ -1,5 +1,7 @@
 package com.test.sockettestclient;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,7 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,22 +34,27 @@ public class MainActivity extends AppCompatActivity {
 
     //화면 킬 시간 변수
     public static final int WAKEUP_HOUR = 8;
-    public static final int WAKEUP_MINIUTE = 16;
+    public static final int WAKEUP_MINIUTE = 30;
     public static final int WAKEUP_SECOND = 0;
     public static final int WAKEUP_MILISECOND = 0;
 
 
     //화면 끌 시간 변수
-    public static final int GOTOSLEEP_HOUR = 8;
-    public static final int GOTOSLEEP_MINIUTE = 17;
+    public static final int GOTOSLEEP_HOUR = 17;
+    public static final int GOTOSLEEP_MINIUTE = 29;
     public static final int GOTOSLEEP_SECOND = 0;
     public static final int GOTOSLEEP_MILISECOND = 0;
+    private static final int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1;
 
     //로컬 IP사용시 127.0.0.1로 ip 변경하기
-    //private final String ip = "127.0.0.1";
-    private final String ip = "10.0.2.16";  // 에뮬레이터 ip
+    private final String ip = "127.0.0.1";
+    //private final String ip = "10.0.2.16";  // 에뮬레이터 ip
     private final String port = "5001";
     int endSignal = 0;
+
+
+    private long backKeyPressedTime = 0;
+    private Toast toast;
 
     Socket socket;     //클라이언트의 소켓
     Button btn_end;
@@ -72,20 +82,19 @@ public class MainActivity extends AppCompatActivity {
         ActionBar ac = getSupportActionBar();
         ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");
 
-        //btn_end = findViewById(R.id.btn_end);
         //ClientSocketOpen(endSignal);
 
+        //브로드캐스트 리시버 사용시 액티비티 띄우지 못한 문제 Overlay View로 해결
+        //다른 앱 위에 그리기 허용 체크 해야함.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
+            if (!Settings.canDrawOverlays(this)) {              // 다른앱 위에 그리기 체크
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
+                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+            }
+        }
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
-
-
-/*        btn_end.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                endSignal = 2;
-                ClientSocketOpen(endSignal);
-            }
-        });*/
 
 
         Intent intent = getIntent();
@@ -109,22 +118,6 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(alarm, filter);
 
-    }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        /*
-        try {
-            socket.close(); //소켓을 닫는다.
-            moveTaskToBack(true); // 태스크를 백그라운드로 이동
-            finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
-            android.os.Process.killProcess(android.os.Process.myPid()); //앱 프로세스 종료
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-         */
     }
 
     public void ClientSocketOpen(int endSignal) {
@@ -157,13 +150,8 @@ public class MainActivity extends AppCompatActivity {
                     if (endSignal == 2) {
                         os.write(endSignal);
                         os.flush();
-                        //socket.close();
-                        //moveTaskToBack(true); // 태스크를 백그라운드로 이동
-                        //finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
-                        //android.os.Process.killProcess(android.os.Process.myPid()); //앱 프로세스 종료
                         Log.d(TAG, "signal: " + endSignal);
                     }
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -226,7 +214,43 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        ClientSocketOpen(2);
+        backKeyPressed("뒤로가기 버튼을 한번 더 누르면 종료됩니다.", 5);
+        Log.e(TAG, "소켓 연결 끊김? : " + socket.isConnected());
+
+    }
+
+    public void backKeyPressed(String msg, double time) {
+        if (System.currentTimeMillis() > backKeyPressedTime + (time * 1000)) {
+            backKeyPressedTime = System.currentTimeMillis();
+            showGuide(msg);
+            return;
+        }
+
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            try {
+                socket.close();
+                moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+                android.os.Process.killProcess(android.os.Process.myPid()); //앱 프로세스 종료
+                toast.cancel();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void showGuide(String msg) {
+        toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+            if (!Settings.canDrawOverlays(this)) {
+                finish();
+            }
+        }
     }
 }
