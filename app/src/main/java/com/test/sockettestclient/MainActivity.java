@@ -5,6 +5,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -27,6 +30,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int WAKEUP_MINIUTE = 30;
     public static final int WAKEUP_SECOND = 0;
     public static final int WAKEUP_MILISECOND = 0;
-
 
     //화면 끌 시간 변수
     public static final int GOTOSLEEP_HOUR = 17;
@@ -84,33 +87,27 @@ public class MainActivity extends AppCompatActivity {
 
         //ClientSocketOpen(endSignal);
 
-        //브로드캐스트 리시버 사용시 액티비티 띄우지 못한 문제 Overlay View로 해결
-        //다른 앱 위에 그리기 허용 체크 해야함.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
-            if (!Settings.canDrawOverlays(this)) {              // 다른앱 위에 그리기 체크
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
-                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
-            }
-        }
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
-
 
         Intent intent = getIntent();
         String wakeUpValue = intent.getStringExtra("KeepScreenOn");
         String goToSleepValue = intent.getStringExtra("ScreenOff");
         Log.e(TAG, "wakeUpValue : " + wakeUpValue + ", goToSleepValue : " + goToSleepValue);
-        if (wakeUpValue != null){
+
+        if (goToSleepValue != null){
+            if (goToSleepValue.equals("ScreenOff")) {
+                Toast.makeText(this, "잠시 후 화면이 종료됩니다.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (wakeUpValue != null){
             if (wakeUpValue.equals("KeepScreenOn")) {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 Log.e(TAG, "화면 계속 켜기 ON!");
             }
-        } else if (goToSleepValue != null){
-            if (goToSleepValue.equals("ScreenOff")) {
-                Toast.makeText(this, "잠시 후 화면이 종료됩니다.", Toast.LENGTH_SHORT).show();
-            }
+        } else if (wakeUpValue == null && goToSleepValue == null) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            Log.e(TAG, "화면 계속 켜기 ON!");
         }
+
+
 
         Alarm alarm = new Alarm();
         IntentFilter filter = new IntentFilter();
@@ -174,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        //getPackageList();
         ClientSocketOpen(2);
         Log.d(TAG, "homeKey: ");
     }
@@ -244,13 +240,4 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
-            if (!Settings.canDrawOverlays(this)) {
-                finish();
-            }
-        }
-    }
 }
