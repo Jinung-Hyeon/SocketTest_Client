@@ -3,18 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.test.sockettestclient">
 
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <uses-permission android:name="MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
-
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
 
     <application
         android:allowBackup="true"
@@ -24,6 +24,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SocketTestClient"
         tools:ignore="MissingTvBanner">
+
+        <service
+            android:name=".DIDForegroundService"
+            android:enabled="true" />
+
         <receiver
             android:name=".Alarm"
             android:enabled="true"
@@ -35,16 +40,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".GoToSleepAlarm"
             android:enabled="true"
-            android:exported="true"></receiver>
-
+            android:exported="true" />
         <receiver
             android:name=".WakeUpAlarm"
             android:enabled="true"
-            android:exported="true" ></receiver>
+            android:exported="true" />
 
         <activity
             android:name=".MainActivity"

@@ -9,6 +9,7 @@ import static com.test.sockettestclient.MainActivity.WAKEUP_MILISECOND;
 import static com.test.sockettestclient.MainActivity.WAKEUP_MINIUTE;
 import static com.test.sockettestclient.MainActivity.WAKEUP_SECOND;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -17,12 +18,13 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 import java.util.Calendar;
 
 public class Alarm extends BroadcastReceiver {
     private static final String TAG = "AlarmTest";
     private Intent i, sendWakeUpAlarmIntent, sendGoToSleepAlarmIntent;
-
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -90,4 +92,6 @@ public class Alarm extends BroadcastReceiver {
             }
         }
     }
+
+
 }
