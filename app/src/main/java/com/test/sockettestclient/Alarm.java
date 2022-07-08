@@ -25,6 +25,9 @@ import java.util.Calendar;
 public class Alarm extends BroadcastReceiver {
     private static final String TAG = "AlarmTest";
     private Intent i, sendWakeUpAlarmIntent, sendGoToSleepAlarmIntent;
+
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
