@@ -51,7 +51,7 @@ public class Alarm extends BroadcastReceiver {
                         c.add(Calendar.DATE, 1);
                     }
 
-                    PendingIntent bootPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    PendingIntent bootPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 2, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                     AlarmManager bootAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
                     AlarmManager.AlarmClockInfo bootAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), bootPendingIntent);
                     bootAlarmManager.setAlarmClock(bootAc, bootPendingIntent);
@@ -86,7 +86,7 @@ public class Alarm extends BroadcastReceiver {
                         c.add(Calendar.DATE, 1);
                     }
 
-                    PendingIntent wakeUpPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, sendWakeUpAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    PendingIntent wakeUpPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 1, sendWakeUpAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                     AlarmManager wakeUpAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
                     AlarmManager.AlarmClockInfo wakeUpAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), wakeUpPendingIntent);
                     wakeUpAlarmManager.setAlarmClock(wakeUpAc, wakeUpPendingIntent);
