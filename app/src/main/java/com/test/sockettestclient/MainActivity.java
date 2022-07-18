@@ -14,6 +14,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private final String port = "5001";
 
 
+    FinishWork fw = new FinishWork();
 
     public Socket socket;     //클라이언트의 소켓
     public DataInputStream is;
@@ -73,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.e(TAG, "onResume!!" );
+
+        // 화면 켜주는 기능
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
         try {
             overridePendingTransition(0,0);
         } catch (Exception e) {
@@ -85,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 화면 절전 모드 진입
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         ActionBar ac = getSupportActionBar();
         ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         Intent intent = getIntent();
         String wakeUpValue = intent.getStringExtra("KeepScreenOn");
@@ -105,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
             if (wakeUpValue.equals("KeepScreenOn")) {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 Log.e(TAG, "화면 계속 켜기 ON!");
+                ClientSocketOpen(endSignal);
             }
         } else if (wakeUpValue == null && goToSleepValue == null) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -128,21 +137,9 @@ public class MainActivity extends AppCompatActivity {
 //            goToSleepAlarmManager.setAlarmClock(goToSleepAc, goToSleepPendingIntent);
 
             Log.e(TAG, "화면 계속 켜기 ON!");
-        }
-
-        //브로드캐스트 리시버 사용시 액티비티 띄우지 못한 문제 Overlay View로 해결
-        //다른 앱 위에 그리기 허용 체크 해야함.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   // 마시멜로우 이상일 경우
-            if (!Settings.canDrawOverlays(this)) {              // 다른앱 위에 그리기 체크
-                Uri uri = Uri.fromParts("package" , getPackageName(), null);
-                Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
-                startActivityForResult(i, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
-            } else {
-                ClientSocketOpen(endSignal);
-            }
-        } else {
             ClientSocketOpen(endSignal);
         }
+
 
         Alarm alarm = new Alarm();
         IntentFilter filter = new IntentFilter();
@@ -150,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(alarm, filter);
 
+
     }
+
 
     public void ClientSocketOpen(int endSignal) {
         if (ip.isEmpty() || port.isEmpty()) {
@@ -163,23 +162,26 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     try {
                         //서버와 연결하는 소켓 생성
-                        if (socket == null){
+                        if (socket == null || socket.isClosed()){
                             socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
                             is = new DataInputStream(socket.getInputStream());
                             os = new DataOutputStream(socket.getOutputStream());
+                            while (System.currentTimeMillis() < fw.makeStartWorkTime(17, 24, 0,0)){
+                                os.write(endSignal);
+                                os.flush();
+                                Log.e(TAG, "신호 보냄");
+                                Thread.sleep(60 * 2 * 1000);
+                            }
                         }
-
-                        if (endSignal == 2) {
-                            os.write(endSignal);
-                            os.flush();
-                            Log.e(TAG, "signal: " + endSignal);
-                        }
+                        Log.e(TAG, "업무시간이 지나서 소켓을 종료합니다. ");
+                        is.close();
+                        os.flush();
                         socket.close();
                     } catch (Exception e) {
                         if(!socket.isClosed()){
                             try {
-
-
+                                is.close();
+                                os.flush();
                                 socket.close();
                             } catch (IOException ioException) {
                                 ioException.printStackTrace();
@@ -195,7 +197,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        ClientSocketOpen(2);
+        // 홈 버튼 누르면
+        getPackageList();
         Log.d(TAG, "homeKey: ");
     }
 
@@ -207,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
         backKeyPressed("뒤로가기 버튼을 한번 더 누르면 종료됩니다.", 5);
     }
 
@@ -218,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            // 프로세스 종료시켜서 다시 켜지지 watchdog에서 연결 끊김 신호를 받아도 다시 실행되지 못하게함.
+            android.os.Process.killProcess(android.os.Process.myPid());
             ActivityCompat.finishAffinity(this);
             System.exit(0);
             toast.cancel();
@@ -247,17 +253,34 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "onStop!!");
     }
 
-    //    @Override
-//    protected void onDestroy() {
-//        Log.e(TAG, "onDestroy");
-//        try {
-//
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        super.onDestroy();
-//
-//    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "onDestroy");
+    }
 
+
+    public void getPackageList() {
+        //SDK30이상은 Manifest권한 추가가 필요 출처:https://inpro.tistory.com/214
+        PackageManager pkgMgr = getPackageManager();
+        List<ResolveInfo> mApps;
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        mApps = pkgMgr.queryIntentActivities(mainIntent, 0);
+
+        try {
+            for (int i = 0; i < mApps.size(); i++) {
+                if(mApps.get(i).activityInfo.packageName.startsWith("com.test.sockettestclient")){
+                    Log.d("start", "실행시킴");
+                    break;
+                }
+            }
+            Intent intent = getPackageManager().getLaunchIntentForPackage("com.test.sockettestclient");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
