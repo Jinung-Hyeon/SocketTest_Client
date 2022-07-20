@@ -25,11 +25,13 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -62,10 +64,12 @@ public class MainActivity extends AppCompatActivity {
     public Socket socket;     //클라이언트의 소켓
     public DataInputStream is;
     public DataOutputStream os;
-    int endSignal = 0;
+    public static int endSignal = 0;
 
     private long backKeyPressedTime = 0;
     private Toast toast;
+
+    SocketThread thread;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -81,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
         // 화면 켜주는 기능
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
+        thread = new SocketThread();
+        thread.start();
+
         try {
             overridePendingTransition(0,0);
         } catch (Exception e) {
@@ -93,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 화면 절전 모드 진입
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // 화면 절전 모드 해제
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         ActionBar ac = getSupportActionBar();
         ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");
@@ -104,8 +111,12 @@ public class MainActivity extends AppCompatActivity {
         String goToSleepValue = intent.getStringExtra("ScreenOff");
         Log.e(TAG, "wakeUpValue : " + wakeUpValue + ", goToSleepValue : " + goToSleepValue);
 
-        if (goToSleepValue != null){
+
+
+        if (goToSleepValue != null){ // 일과 시간 종료 알람 받고 넘오면 처리할 조건문. 화면 절전 모드 진입 시키고 5분뒤 TV꺼짐
             if (goToSleepValue.equals("ScreenOff")) {
+                // 화면 절전 모드 진입
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 Toast.makeText(this, "잠시 후 화면이 종료됩니다.", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "잠시 후 화면이 종료됩니다.");
             }
@@ -113,31 +124,11 @@ public class MainActivity extends AppCompatActivity {
             if (wakeUpValue.equals("KeepScreenOn")) {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 Log.e(TAG, "화면 계속 켜기 ON!");
-                ClientSocketOpen(endSignal);
             }
-        } else if (wakeUpValue == null && goToSleepValue == null) {
+        } else if (wakeUpValue == null && goToSleepValue == null) { // 앱이 잘못 실행되어 시작, 종료 값이 없을때를 대비해 만든 조건문.
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-//            Calendar c = Calendar.getInstance();
-//            Intent sendGoToSleepAlarmIntent = new Intent(this, GoToSleepAlarm.class);
-//
-//            c.set(Calendar.HOUR_OF_DAY, GOTOSLEEP_HOUR);
-//            c.set(Calendar.MINUTE, GOTOSLEEP_MINIUTE);
-//            c.set(Calendar.SECOND, GOTOSLEEP_SECOND);
-//            c.set(Calendar.MILLISECOND, GOTOSLEEP_MILISECOND);
-//            Log.e(TAG, "GoToSleep 알람 예약!!! time : " + c.getTime() + " getTimeInMillis : " + c.getTimeInMillis() + " currentTime : " + System.currentTimeMillis());
-//
-//            if(c.before(Calendar.getInstance())){
-//                c.add(Calendar.DATE, 1);
-//            }
-//
-//            PendingIntent goToSleepPendingIntent = PendingIntent.getBroadcast(this, 0, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-//            AlarmManager goToSleepAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-//            AlarmManager.AlarmClockInfo goToSleepAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), goToSleepPendingIntent);
-//            goToSleepAlarmManager.setAlarmClock(goToSleepAc, goToSleepPendingIntent);
-
             Log.e(TAG, "화면 계속 켜기 ON!");
-            ClientSocketOpen(endSignal);
+
         }
 
 
@@ -151,47 +142,95 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void ClientSocketOpen(int endSignal) {
-        if (ip.isEmpty() || port.isEmpty()) {
-            Toast.makeText(this, "ip주소와 포트번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+    class SocketThread extends Thread{
+        @Override
+        public void run() {
+            if (System.currentTimeMillis() > fw.makeStartWorkTime(GOTOSLEEP_HOUR, GOTOSLEEP_MINIUTE, GOTOSLEEP_SECOND,GOTOSLEEP_MILISECOND)) {
+                Log.e(TAG, "업무시간이 지나서 소켓을 실행하지 않습니다. ");
+            }
+            try {
+                //서버와 연결하는 소켓 생성
+                if (socket == null || socket.isClosed() && endSignal != 2){
+                    socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
+                    is = new DataInputStream(socket.getInputStream());
+                    os = new DataOutputStream(socket.getOutputStream());
 
-        } else {
+                    while (System.currentTimeMillis() < fw.makeStartWorkTime(GOTOSLEEP_HOUR, GOTOSLEEP_MINIUTE, GOTOSLEEP_SECOND,GOTOSLEEP_MILISECOND)){
+                        os.write(endSignal);
+                        os.flush();
+                        Log.e(TAG, "신호 보냄");
+                        Thread.sleep(20000);
+                    }
+                }
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+                Log.e(TAG, "업무시간이 지나서 소켓을 종료합니다. ");
+                is.close();
+                os.flush();
+                socket.close();
+            } catch (Exception e) {
+                if(!socket.isClosed()){
                     try {
-                        //서버와 연결하는 소켓 생성
-                        if (socket == null || socket.isClosed()){
-                            socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
-                            is = new DataInputStream(socket.getInputStream());
-                            os = new DataOutputStream(socket.getOutputStream());
-                            while (System.currentTimeMillis() < fw.makeStartWorkTime(17, 24, 0,0)){
-                                os.write(endSignal);
-                                os.flush();
-                                Log.e(TAG, "신호 보냄");
-                                Thread.sleep(60 * 2 * 1000);
-                            }
-                        }
-                        Log.e(TAG, "업무시간이 지나서 소켓을 종료합니다. ");
                         is.close();
                         os.flush();
                         socket.close();
-                    } catch (Exception e) {
-                        if(!socket.isClosed()){
-                            try {
-                                is.close();
-                                os.flush();
-                                socket.close();
-                            } catch (IOException ioException) {
-                                ioException.printStackTrace();
-                            }
-                        }
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
                     }
                 }
-            }).start();
+            }
         }
     }
+
+//    public void ClientSocketOpen(int endSignal) {
+//
+//        if (ip.isEmpty() || port.isEmpty()) {
+//            Toast.makeText(this, "ip주소와 포트번호를 입력해주세요.", Toast.LENGTH_SHORT).show();
+//
+//        } else {
+//
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                    try {
+//                        //서버와 연결하는 소켓 생성
+//                        if (socket == null || socket.isClosed()){
+//                            socket = new Socket(InetAddress.getByName(ip), Integer.parseInt(port));
+//                            is = new DataInputStream(socket.getInputStream());
+//                            os = new DataOutputStream(socket.getOutputStream());
+//
+//                            while (System.currentTimeMillis() < fw.makeStartWorkTime(GOTOSLEEP_HOUR, GOTOSLEEP_MINIUTE, GOTOSLEEP_SECOND,GOTOSLEEP_MILISECOND)){
+//                                os.write(endSignal);
+//                                os.flush();
+//                                Log.e(TAG, "신호 보냄");
+//                                Thread.sleep(10000);
+//                            }
+//                        }
+//
+//                        Log.e(TAG, "업무시간이 지나서 소켓을 종료합니다. ");
+//                        is.close();
+//                        os.flush();
+//                        socket.close();
+//                    } catch (Exception e) {
+//                        if(!socket.isClosed()){
+//                            try {
+//                                is.close();
+//                                os.flush();
+//                                socket.close();
+//                            } catch (IOException ioException) {
+//                                ioException.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                }
+//            }).start();
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
     @Override
@@ -205,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        thread.interrupt();
         Log.e(TAG, "onPause!!");
     }
 
@@ -216,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void backKeyPressed(String msg, double time) {
         if (System.currentTimeMillis() > backKeyPressedTime + (time * 1000)) {
+            thread.interrupt();
+            endSignal = 2;
             backKeyPressedTime = System.currentTimeMillis();
             showGuide(msg);
             return;
@@ -223,6 +265,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
             // 프로세스 종료시켜서 다시 켜지지 watchdog에서 연결 끊김 신호를 받아도 다시 실행되지 못하게함.
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             android.os.Process.killProcess(android.os.Process.myPid());
             ActivityCompat.finishAffinity(this);
             System.exit(0);
@@ -282,5 +329,18 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String makeGoToSleepTime(int hour, int minute, int second, int millisecond){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS");
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, minute);
+        c.set(Calendar.SECOND, second);
+        c.set(Calendar.MILLISECOND, millisecond);
+
+        String sleepTime = format.format(c.getTimeInMillis());
+        Log.e(TAG, "sleepTime : " + sleepTime);
+        return sleepTime;
     }
 }
