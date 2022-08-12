@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="800px"
+    android:layout_height="700px"
+    android:orientation="vertical"
+    android:background="#c0c0c0"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:text="정보입력"
+            android:textAlignment="center"
+            android:textSize="40dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.8"
+            android:textColor="@color/black"/>
+        <TextView
+            android:layout_gravity="center"
+            android:text="IP를 입력하세요."
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:layout_width="740px"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"/>
+
+        <EditText
+            android:id="@+id/edt_ip"
+            android:layout_width="760px"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1.1"
+            android:hint="ip를 입력하세요"
+            android:cursorVisible="true"
+            android:textIsSelectable="true"/>
+
+        <TextView
+            android:layout_gravity="center"
+            android:text="PORT번호를 입력하세요."
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:layout_width="740px"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"/>
+
+        <EditText
+            android:id="@+id/edt_port"
+            android:hint="port번호를 입력하세요"
+            android:layout_width="760px"
+            android:layout_gravity="center"
+            android:layout_height="0dp"
+            android:layout_weight="1.1"/>
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_gravity="center"
+            android:text="저장"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:background="#00ff0000"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+
+
+
+
+    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

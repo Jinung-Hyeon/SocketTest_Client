@@ -10,7 +10,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:src="@drawable/did_basic_image"
+        android:src="@drawable/img1"
+        android:scaleType="fitXY"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

@@ -1,15 +1,6 @@
 package com.test.sockettestclient;
 
-import static com.test.sockettestclient.MainActivity.GOTOSLEEP_HOUR;
-import static com.test.sockettestclient.MainActivity.GOTOSLEEP_MILISECOND;
-import static com.test.sockettestclient.MainActivity.GOTOSLEEP_MINIUTE;
-import static com.test.sockettestclient.MainActivity.GOTOSLEEP_SECOND;
-import static com.test.sockettestclient.MainActivity.WAKEUP_HOUR;
-import static com.test.sockettestclient.MainActivity.WAKEUP_MILISECOND;
-import static com.test.sockettestclient.MainActivity.WAKEUP_MINIUTE;
-import static com.test.sockettestclient.MainActivity.WAKEUP_SECOND;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -18,79 +9,78 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Alarm extends BroadcastReceiver {
     private static final String TAG = "AlarmTest";
     private Intent i, sendWakeUpAlarmIntent, sendGoToSleepAlarmIntent;
+    private WorkTime workTime;
 
 
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+
         i = new Intent(context, MainActivity.class);
         sendWakeUpAlarmIntent = new Intent(context, WakeUpAlarm.class);
         sendGoToSleepAlarmIntent = new Intent(context, GoToSleepAlarm.class);
-
-        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        workTime = new WorkTime();
+        Calendar wakeUp = workTime.startWorkTime();
+        Calendar sleep = workTime.finishWorkTime();
 
         if(action != null) {
             switch (action) {
                 case Intent.ACTION_BOOT_COMPLETED:
                     Toast.makeText(context, "BOOT_COMPLETED", Toast.LENGTH_SHORT).show();
-                    c.set(Calendar.HOUR_OF_DAY, GOTOSLEEP_HOUR);
-                    c.set(Calendar.MINUTE, GOTOSLEEP_MINIUTE);
-                    c.set(Calendar.SECOND, GOTOSLEEP_SECOND);
-                    c.set(Calendar.MILLISECOND, GOTOSLEEP_MILISECOND);
-                    Log.e(TAG, "GoToSleep 알람 예약!!! time : " + c.getTime() + " getTimeInMillis : " + c.getTimeInMillis() + " currentTime : " + System.currentTimeMillis());
-
-                    if(c.before(Calendar.getInstance())){
-                        c.add(Calendar.DATE, 1);
-                    }
+                    Log.e(TAG, "GoToSleep 알람 예약!!! 꺼짐 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()) + " || 현재시간 : " + dateFormat.format(System.currentTimeMillis()));
 
                     PendingIntent bootPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 2, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                     AlarmManager bootAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-                    AlarmManager.AlarmClockInfo bootAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), bootPendingIntent);
+                    AlarmManager.AlarmClockInfo bootAc = new AlarmManager.AlarmClockInfo(workTime.finishWorkTime().getTimeInMillis(), bootPendingIntent);
                     bootAlarmManager.setAlarmClock(bootAc, bootPendingIntent);
                     //context.startActivity(i);
                     break;
                 case Intent.ACTION_SCREEN_ON:
                     Log.e(TAG, "SCREEN_ON");
-                    c.set(Calendar.HOUR_OF_DAY, GOTOSLEEP_HOUR);
-                    c.set(Calendar.MINUTE, GOTOSLEEP_MINIUTE);
-                    c.set(Calendar.SECOND, GOTOSLEEP_SECOND);
-                    c.set(Calendar.MILLISECOND, GOTOSLEEP_MILISECOND);
-                    Log.e(TAG, "GoToSleep 알람 예약!!! time : " + c.getTime() + " getTimeInMillis : " + c.getTimeInMillis() + " currentTime : " + System.currentTimeMillis());
+                    Log.e(TAG, "GoToSleep 알람 예약!!! 꺼짐 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()) + " || 현재시간 : " + dateFormat.format(System.currentTimeMillis()));
 
-                    if(c.before(Calendar.getInstance())){
-                        c.add(Calendar.DATE, 1);
+                    if(workTime.finishWorkTime().before(Calendar.getInstance())){
+                        sleep.add(Calendar.DATE, 1);
                     }
 
                     PendingIntent goToSleepPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 0, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                     AlarmManager goToSleepAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-                    AlarmManager.AlarmClockInfo goToSleepAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), goToSleepPendingIntent);
+                    AlarmManager.AlarmClockInfo goToSleepAc = new AlarmManager.AlarmClockInfo(sleep.getTimeInMillis(), goToSleepPendingIntent);
                     goToSleepAlarmManager.setAlarmClock(goToSleepAc, goToSleepPendingIntent);
                     break;
                 case Intent.ACTION_SCREEN_OFF:
+                    UdpThread.toServerSignal = "2";
+                    UdpThread udpThread = new UdpThread();
+                    udpThread.start();
+
                     Log.e(TAG, "SCREEN_OFF");
-                    c.set(Calendar.HOUR_OF_DAY, WAKEUP_HOUR);
-                    c.set(Calendar.MINUTE, WAKEUP_MINIUTE);
-                    c.set(Calendar.SECOND, WAKEUP_SECOND);
-                    c.set(Calendar.MILLISECOND, WAKEUP_MILISECOND);
-                    Log.e(TAG, "WakeUp 알람 예약!!! time : " + c.getTime() + " getTimeInMillis : " + c.getTimeInMillis() + " currentTime : " + System.currentTimeMillis());
 
-                    if(c.before(Calendar.getInstance())){
-                        c.add(Calendar.DATE, 1);
+                    if (System.currentTimeMillis() > workTime.finishWorkTime().getTimeInMillis()){  // 현재시간 > 일과종료시간 -> 일과종료후 화면이 꺼진것이므로 다음날 아침에 화면 깨울 시간 예약
+                        if(workTime.startWorkTime().before(Calendar.getInstance())){
+                            wakeUp.add(Calendar.DATE, 1);
+                            //Log.e(TAG, dateFormat.format(c.getTimeInMillis()));
+                        }
+
+                        Log.e(TAG, "WakeUp 알람 예약!!! 켜짐 예약 시간 : " + dateFormat.format(wakeUp.getTimeInMillis()) + " || 현재시간 : " + dateFormat.format(System.currentTimeMillis()));
+                        PendingIntent wakeUpPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 1, sendWakeUpAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                        AlarmManager wakeUpAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+                        AlarmManager.AlarmClockInfo wakeUpAc = new AlarmManager.AlarmClockInfo(wakeUp.getTimeInMillis(), wakeUpPendingIntent);
+                        wakeUpAlarmManager.setAlarmClock(wakeUpAc, wakeUpPendingIntent);
+                        //context.startActivity(i);
+                    } else if (System.currentTimeMillis() < workTime.finishWorkTime().getTimeInMillis()){
+                        Log.e(TAG, "현재 시간 : " + dateFormat.format(System.currentTimeMillis()) + " 종료 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()));
+                        Log.e(TAG, "아직 일과 종료시간 전입니다. 다시 화면을 실행합니다.");
+                        i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        context.startActivity(i);
                     }
-
-                    PendingIntent wakeUpPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 1, sendWakeUpAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-                    AlarmManager wakeUpAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-                    AlarmManager.AlarmClockInfo wakeUpAc = new AlarmManager.AlarmClockInfo(c.getTimeInMillis(), wakeUpPendingIntent);
-                    wakeUpAlarmManager.setAlarmClock(wakeUpAc, wakeUpPendingIntent);
-                    //context.startActivity(i);
                     break;
             }
         }
