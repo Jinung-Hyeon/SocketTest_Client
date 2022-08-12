@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     ArrayList<String> textList, contentsPathList;
 
     String androidId = "6f2d4597912ecc39";
+    PlayImage playImage;
 
 
     @Override
@@ -126,6 +127,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.e(TAG, "여기는 mainActivity");
+
+        playImage = new PlayImage();
 
         tts = new TextToSpeech(this,this);
 
@@ -211,12 +216,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                             speechTimeList.clear();
                             textList.clear();
                             contentsPathList.clear();
+
                             ObjectResult objectResults = response.body();
+
                             Log.e(TAG, "레트로핏 성공");
                             //Log.d("msg", objectResults.toString());
                             for (int i = 0; i < objectResults.contents.size(); i++ ){
                                 //Log.d("msg", objectResults.contents.get(i).toString());
-                                Log.d("msg", objectResults.contents.get(i).getContentsPath());
+                                Log.d(TAG, objectResults.contents.get(i).getContentsPath());
                                 speechTimeList.add(objectResults.contents.get(i).speechTime);
                                 textList.add(objectResults.contents.get(i).text);
                                 contentsPathList.add(objectResults.contents.get(i).contentsPath);
@@ -228,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
 
                             //iv.setImageResource(R.drawable.did_basic_image);
-                            PlayImage playImage = new PlayImage();
                             playImage.start();
                         }
 
@@ -262,8 +268,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     }
                     os.write(endSignal);
                     os.flush();
-                    //is.close();
-                    //socket.close();
                 } catch (Exception e) {
                     Log.e(TAG, " 서버 소켓이 안열려 있는듯? WatchDog 죽은거아님? 다시실행 ㄱㄱ : " + e);
                     // WatchDog앱이 죽어있을경우 앱을 다시 실행시켜줌.
@@ -282,29 +286,67 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
-    // 서버에서 받아온 이미지, 텍스트, 스피치타임을 담은 imageList, textList, speechTimeList을 사용해 정보 출력.
     class PlayImage extends Thread {
         @Override
         public void run() {
-            for (int i = 0; i < contentsPathList.size(); i++) {
-                int j = i;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Glide.with(MainActivity.this)
-                                .load(IMAGE_URL + contentsPathList.get(j))
-                                .into(imageView);
-                        speakOut(textList.get(j));
+            //Log.e(TAG, "스레드 이름 : " + Thread.currentThread().getName());
+            try {
+                int i = 0;
+                while (true) {
+                    int j = i;
+                    //Log.e(TAG, "i1 : " + i);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(MainActivity.this)
+                                    .load(IMAGE_URL + contentsPathList.get(j))
+                                    .into(imageView);
+                            speakOut(textList.get(j));
+                            Log.e(TAG, textList.get(j));
+                        }
+                    });
+                    if (Thread.currentThread().interrupted()){
+                        Log.e(TAG, "스레드 종료됨!");
+                        break;
                     }
-                });
-                try {
-                    Log.e("msg", "슬립들어옴");
+                    Log.e(TAG, "슬립들어옴");
                     Thread.sleep(speechTimeList.get(i) * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    i++;
+                    //Log.e(TAG, "i2 : " + i);
 
+                    // 리스트 다 돌면 다시 처음부터 재생하기위해 i값 0으로 초기화
+                    if (i == contentsPathList.size()){
+                        i = 0;
+                        Log.e(TAG, "i가 큽니다. 초기화시킵니다." + i);
+                    }
                 }
+//                for (int i = 0; i < contentsPathList.size(); i++) {
+//                    //Log.e(TAG, "speechTimeList.size : " + speechTimeList.size());
+//                    //Log.e(TAG, "textList.size : " + textList.size());
+//                    //Log.e(TAG, "contentsPathList.size : " + contentsPathList.size());
+//                    int j = i;
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Glide.with(MainActivity.this)
+//                                    .load(IMAGE_URL + contentsPathList.get(j))
+//                                    .into(imageView);
+//                            speakOut(textList.get(j));
+//                            Log.e(TAG, textList.get(j));
+//                        }
+//                    });
+//                    if (Thread.currentThread().interrupted()){
+//                        Log.e(TAG, "스레드 종료됨!");
+//                        break;
+//                    }
+//                    Log.e(TAG, "슬립들어옴");
+//                    Thread.sleep(speechTimeList.get(i) * 1000);
+//
+//                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
         }
     }
 
@@ -317,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
 
         tts.setPitch(1.0f); // 음성 톤 높이 지정
-        tts.setSpeechRate(1.0f); // 음성 속도 지정
+        tts.setSpeechRate(0.8f); // 음성 속도 지정
 
 //        for (int i = 0; i < splitText.length; i++) {
 //            tts.speak(splitText[i], TextToSpeech.QUEUE_ADD, null, "id1");
@@ -353,6 +395,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             // 소켓이 생성되어있으면 소켓 종료
             if(socket != null){
                 socket.close();
+            }
+
+            if(System.currentTimeMillis() > workTime.finishWorkTime().getTimeInMillis()){
+                Log.e(TAG, "onPause쪽 조건문. 업무시간이 아닙니다. (일과종료 이후 조건문)");
+                tts.stop();
+                tts.shutdown();
+                //Log.e(TAG, "플레이스레드 이름 : " + playImage.getName());
+                playImage.interrupt();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
