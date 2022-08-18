@@ -78,7 +78,7 @@ public class Alarm extends BroadcastReceiver {
                     } else if (System.currentTimeMillis() < workTime.finishWorkTime().getTimeInMillis()){
                         Log.e(TAG, "현재 시간 : " + dateFormat.format(System.currentTimeMillis()) + " 종료 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()));
                         Log.e(TAG, "아직 일과 종료시간 전입니다. 다시 화면을 실행합니다.");
-                        i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(i);
                     }
                     break;

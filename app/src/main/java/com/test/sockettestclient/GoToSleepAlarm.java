@@ -4,7 +4,6 @@ package com.test.sockettestclient;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,7 +17,7 @@ public class GoToSleepAlarm extends BroadcastReceiver {
         Log.e(TAG,"퇴근 ㅊㅋㅊㅋ");    // 로그 확인용
         Intent intent1 = new Intent(context, LogoutActivity.class);
         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
-        intent1.putExtra("ScreenOff", "ScreenOff");
+        //intent1.putExtra("ScreenOff", "ScreenOff");
         context.startActivity(intent1);
 
     }

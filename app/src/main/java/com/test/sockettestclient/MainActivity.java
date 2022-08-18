@@ -2,10 +2,6 @@ package com.test.sockettestclient;
 
 import static com.test.sockettestclient.constant.Constants.IMAGE_URL;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -21,9 +17,11 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
-
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -84,6 +82,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     String androidId = "6f2d4597912ecc39";
     PlayImage playImage;
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.e(TAG, "onRestart!!");
+    }
 
     @Override
     protected void onResume() {
@@ -182,9 +186,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             AlarmManager goToSleepAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             AlarmManager.AlarmClockInfo goToSleepAc = new AlarmManager.AlarmClockInfo(workTime.finishWorkTime().getTimeInMillis(), goToSleepPendingIntent);
             goToSleepAlarmManager.setAlarmClock(goToSleepAc, goToSleepPendingIntent);
-
-
-
 
 
 
@@ -320,29 +321,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         Log.e(TAG, "i가 큽니다. 초기화시킵니다." + i);
                     }
                 }
-//                for (int i = 0; i < contentsPathList.size(); i++) {
-//                    //Log.e(TAG, "speechTimeList.size : " + speechTimeList.size());
-//                    //Log.e(TAG, "textList.size : " + textList.size());
-//                    //Log.e(TAG, "contentsPathList.size : " + contentsPathList.size());
-//                    int j = i;
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Glide.with(MainActivity.this)
-//                                    .load(IMAGE_URL + contentsPathList.get(j))
-//                                    .into(imageView);
-//                            speakOut(textList.get(j));
-//                            Log.e(TAG, textList.get(j));
-//                        }
-//                    });
-//                    if (Thread.currentThread().interrupted()){
-//                        Log.e(TAG, "스레드 종료됨!");
-//                        break;
-//                    }
-//                    Log.e(TAG, "슬립들어옴");
-//                    Thread.sleep(speechTimeList.get(i) * 1000);
-//
-//                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

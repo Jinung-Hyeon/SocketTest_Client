@@ -1,7 +1,5 @@
 package com.test.sockettestclient;
 
-import static com.test.sockettestclient.constant.Constants.BASE_URL;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -31,18 +29,14 @@ public class InfoSaveDialog extends Dialog {
         edt_port.setInputType(0);
 
         ip_text = PreferenceManager.getIpString(getContext(), "ip");
-        port_text = PreferenceManager.getPortString(getContext(), "port");
 
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(ip_text.length() == 0 || port_text.length() == 0) {
                     PreferenceManager.setIpString(getContext(), "ip", edt_ip.getText().toString());
-                    PreferenceManager.setPortString(getContext(), "port", edt_port.getText().toString());
                     SplashActivity.IP = edt_ip.getText().toString();
-                    SplashActivity.PORT = edt_port.getText().toString();
-                    Log.e("msg", "저장된 정보 : ip = " + ip_text + " port = " + port_text);
-                    Log.d("msg", "BASE_URL : " + BASE_URL);
+                    Log.e("msg", "저장된 정보 : ip = " + ip_text);
                     dismiss();
 
                     try {

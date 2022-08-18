@@ -16,7 +16,7 @@ public class WakeUpAlarm extends BroadcastReceiver {
         Log.e(TAG,"출근 ㅊㅋㅊㅋ");    // 로그 확인용
         Intent intent1 = new Intent(context, SplashActivity.class);
         intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
-        intent1.putExtra("KeepScreenOn", "KeepScreenOn");
+        //intent1.putExtra("KeepScreenOn", "KeepScreenOn");
         context.startActivity(intent1);
     }
 }

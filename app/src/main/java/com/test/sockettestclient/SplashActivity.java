@@ -4,17 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
+    private static final String TAG = "AlarmTest";
     private Context mContext;
-    LoginFragment loginFragment;
 
     String ip_text, port_text;
     IntentThread intentThread = new IntentThread();
+    ImageView iv;
 
     // SharedPreference를 통해 등록할 서버 IP, PORT 번호 변수
     public static String IP = "";
@@ -28,10 +30,8 @@ public class SplashActivity extends AppCompatActivity {
         // 액션바 제거
         ActionBar ac = getSupportActionBar();
         ac.hide();
-
+        Log.e(TAG, "여기는 splashActivity");
         mContext = this;
-        loginFragment = new LoginFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, loginFragment).commit();
         ip_text = PreferenceManager.getIpString(mContext, "ip");    // ip라는 키값에 value를 가지고옴 (value는 프래그먼트에서 edittext안에 값을 저장)
         port_text = PreferenceManager.getPortString(mContext, "port"); // port라는 키값에 value를 가지고옴 (value는 프래그먼트에서 edittext안에 값을 저장)
 
@@ -63,8 +63,4 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
-    // 정보 저장 프래그먼트에서 저장 버튼을 누르면 저장화면 지워주는 메소드
-    public void destroyFragment(){
-        getSupportFragmentManager().beginTransaction().remove(loginFragment).commit();
-    }
 }
