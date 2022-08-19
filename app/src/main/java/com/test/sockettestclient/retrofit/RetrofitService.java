@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.retrofit;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

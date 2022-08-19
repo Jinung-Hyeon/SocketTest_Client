@@ -1,10 +1,12 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.worktime;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.test.sockettestclient.SplashActivity;
 
 public class WakeUpAlarm extends BroadcastReceiver {
 

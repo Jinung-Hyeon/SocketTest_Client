@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -9,7 +9,7 @@ import java.util.List;
 public class ObjectResult {
 
     @SerializedName("contents")
-    List<ContentsResult> contents = new ArrayList<>();
+    public List<ContentsResult> contents = new ArrayList<>();
 
     public List<ContentsResult> getContents() {
         return contents;

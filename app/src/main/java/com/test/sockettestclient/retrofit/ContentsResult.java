@@ -1,23 +1,34 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
 // json Object 안 contents 정보 사용
 public class ContentsResult {
+    @SerializedName("idx")
+    public int idx;
     @SerializedName("speechTime")
-    int speechTime;
+    public int speechTime;
     @SerializedName("text")
-    String text;
+    public String text;
     @SerializedName("contentsPath")
-    String contentsPath;
+    public String contentsPath;
 
     @Override
     public String toString() {
-        return "DataBean{" +
-                "speechTime=" + speechTime +
+        return "ContentsResult{" +
+                "idx=" + idx +
+                ", speechTime=" + speechTime +
                 ", text='" + text + '\'' +
                 ", contentsPath='" + contentsPath + '\'' +
                 '}';
+    }
+
+    public int getIdx() {
+        return idx;
+    }
+
+    public void setIdx(int idx) {
+        this.idx = idx;
     }
 
     public int getSpeechTime() {

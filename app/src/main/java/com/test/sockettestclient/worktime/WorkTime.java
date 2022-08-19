@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.worktime;
 import java.util.Calendar;
 
 public class WorkTime {

@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.retrofit;
 
 import static com.test.sockettestclient.constant.Constants.BASE_URL;
 

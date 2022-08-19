@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.worktime;
 
 
 import android.app.AlarmManager;
@@ -7,7 +7,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.test.sockettestclient.MainActivity;
+import com.test.sockettestclient.socket.UdpThread;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,16 +35,6 @@ public class Alarm extends BroadcastReceiver {
 
         if(action != null) {
             switch (action) {
-                case Intent.ACTION_BOOT_COMPLETED:
-                    Toast.makeText(context, "BOOT_COMPLETED", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "GoToSleep 알람 예약!!! 꺼짐 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()) + " || 현재시간 : " + dateFormat.format(System.currentTimeMillis()));
-
-                    PendingIntent bootPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), 2, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-                    AlarmManager bootAlarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-                    AlarmManager.AlarmClockInfo bootAc = new AlarmManager.AlarmClockInfo(workTime.finishWorkTime().getTimeInMillis(), bootPendingIntent);
-                    bootAlarmManager.setAlarmClock(bootAc, bootPendingIntent);
-                    //context.startActivity(i);
-                    break;
                 case Intent.ACTION_SCREEN_ON:
                     Log.e(TAG, "SCREEN_ON");
                     Log.e(TAG, "GoToSleep 알람 예약!!! 꺼짐 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()) + " || 현재시간 : " + dateFormat.format(System.currentTimeMillis()));
@@ -63,7 +55,7 @@ public class Alarm extends BroadcastReceiver {
 
                     Log.e(TAG, "SCREEN_OFF");
 
-                    if (System.currentTimeMillis() > workTime.finishWorkTime().getTimeInMillis()){  // 현재시간 > 일과종료시간 -> 일과종료후 화면이 꺼진것이므로 다음날 아침에 화면 깨울 시간 예약
+                    if (System.currentTimeMillis() >= workTime.finishWorkTime().getTimeInMillis()){  // 현재시간 > 일과종료시간 -> 일과종료후 화면이 꺼진것이므로 다음날 아침에 화면 깨울 시간 예약
                         if(workTime.startWorkTime().before(Calendar.getInstance())){
                             wakeUp.add(Calendar.DATE, 1);
                             //Log.e(TAG, dateFormat.format(c.getTimeInMillis()));

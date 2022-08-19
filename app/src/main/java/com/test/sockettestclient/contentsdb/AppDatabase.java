@@ -1,4 +1,4 @@
-package com.test.contentsdb;
+package com.test.sockettestclient.contentsdb;
 
 import android.content.Context;
 

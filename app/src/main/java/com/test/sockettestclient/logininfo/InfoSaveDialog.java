@@ -1,14 +1,19 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.logininfo;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+
+import com.test.sockettestclient.MainActivity;
+import com.test.sockettestclient.R;
+import com.test.sockettestclient.SplashActivity;
 
 public class InfoSaveDialog extends Dialog {
 
@@ -18,9 +23,15 @@ public class InfoSaveDialog extends Dialog {
 
     public InfoSaveDialog(@NonNull Context context) {
         super(context);
+
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.infosave_dialog);
         edt_ip = findViewById(R.id.edt_ip);
-        edt_port = findViewById(R.id.edt_port);
         btn_save = findViewById(R.id.btn_save);
 
 
@@ -51,4 +62,5 @@ public class InfoSaveDialog extends Dialog {
             }
         });
     }
+
 }

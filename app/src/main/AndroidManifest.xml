@@ -34,39 +34,6 @@
         tools:ignore="MissingTvBanner"
         android:usesCleartextTraffic="true">
 
-        <receiver
-            android:name=".Alarm"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".GoToSleepAlarm"
-            android:enabled="true"
-            android:exported="true" />
-        <receiver
-            android:name=".WakeUpAlarm"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity
-            android:name=".SplashActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".MainActivity"
-            android:exported="true"/>
     </application>
 
 </manifest>

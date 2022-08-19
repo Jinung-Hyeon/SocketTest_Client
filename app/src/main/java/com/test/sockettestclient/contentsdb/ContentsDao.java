@@ -1,7 +1,6 @@
-package com.test.contentsdb;
+package com.test.sockettestclient.contentsdb;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -10,12 +9,12 @@ import java.util.List;
 @Dao
 public interface ContentsDao {
 
-    @Query("SELECT * FROM contents")
+    @Query("SELECT * FROM Contents")
     List<Contents> getAllContents();
 
     @Insert
     void insertContents(Contents contents);
 
-    @Delete
-    void deleteContents(Contents contents);
+    @Query("DELETE FROM Contents")
+    void deleteAllContents();
 }

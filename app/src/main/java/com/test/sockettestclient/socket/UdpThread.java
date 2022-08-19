@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.socket;
 
 import android.util.Log;
 
@@ -9,7 +9,7 @@ import java.net.InetAddress;
 
 // 서버에 UDP 통신을 하기위한 쓰레드
 public class UdpThread extends Thread{
-    private static final String TAG = "AlarmTest";
+    private final String TAG = "AlarmTest";
     public static String toServerSignal = "0";
 
     @Override

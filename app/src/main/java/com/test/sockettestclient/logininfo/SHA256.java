@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.logininfo;
 
 
 import android.util.Log;

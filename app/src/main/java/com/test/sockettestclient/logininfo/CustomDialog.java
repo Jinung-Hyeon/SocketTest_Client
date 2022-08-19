@@ -1,4 +1,4 @@
-package com.test.sockettestclient;
+package com.test.sockettestclient.logininfo;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+
+import com.test.sockettestclient.R;
 
 public class CustomDialog extends Dialog {
     public CustomDialog(@NonNull Context context) {
