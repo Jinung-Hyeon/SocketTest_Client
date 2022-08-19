@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 UdpThread.toServerSignal = "1";
                 udpThread = new UdpThread();
                 udpThread.start();
-                socket.close();
+                socketthread.socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
