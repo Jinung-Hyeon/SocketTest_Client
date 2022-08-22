@@ -19,28 +19,6 @@ public class QueryContents {
         this.contentsResultList = list; // 서버로 받아온 JSON정보
     }
 
-    public List<ContentsResult> getContentsResultList() {
-        Contents contents = new Contents();
-
-        db = AppDatabase.getDBInstance(mContext.getApplicationContext());
-        List<Contents> contentsList = db.contentsDao().getAllContents();
-
-        for (int i = 0; i < contentsList.size(); i++){
-//            contentsResultList.get(i).text = contents.text;
-//            contentsResultList.get(i).contentsPath = contents.imgUrl;
-//            contentsResultList.get(i).speechTime = contents.speechTime;
-//            contentsResultList.get(i).idx = contents.idx;
-            Log.e(TAG, "contentsList.get(i): " + contentsList.get(i));
-            contentsResultList.get(i).setText(contents.text);
-            contentsResultList.get(i).setIdx(contents.idx);
-            contentsResultList.get(i).setContentsPath(contents.imgUrl);
-            contentsResultList.get(i).setSpeechTime(contents.speechTime);
-
-        }
-
-        return contentsResultList;
-    }
-
     public boolean updateCheck(){
         db = AppDatabase.getDBInstance(mContext.getApplicationContext());
         List<Contents> contentsList = db.contentsDao().getAllContents();
