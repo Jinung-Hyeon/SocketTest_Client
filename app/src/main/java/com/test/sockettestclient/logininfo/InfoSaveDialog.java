@@ -17,7 +17,7 @@ import com.test.sockettestclient.SplashActivity;
 
 public class InfoSaveDialog extends Dialog {
 
-    EditText edt_ip, edt_port;
+    EditText edt_ip;
     String ip_text, port_text;
     Button btn_save;
 
@@ -37,7 +37,6 @@ public class InfoSaveDialog extends Dialog {
 
         //edt_ip.requestFocus(); // EditText에 자동 포커스
         edt_ip.setInputType(0);
-        edt_port.setInputType(0);
 
         ip_text = PreferenceManager.getIpString(getContext(), "ip");
 

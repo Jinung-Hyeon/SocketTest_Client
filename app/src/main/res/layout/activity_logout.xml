@@ -7,13 +7,29 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <ImageView
-        android:id="@+id/logout_activity_iv"
-        android:src="@drawable/img1"
-        android:scaleType="fitXY"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+
+
+        <ImageView
+            android:id="@+id/logout_activity_iv"
+            android:src="@drawable/img1"
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="잠시 후 화면이 종료됩니다."
+            android:textStyle="bold"
+            android:textSize="40dp"/>
+
+    </FrameLayout>
+
 
 
 </LinearLayout>

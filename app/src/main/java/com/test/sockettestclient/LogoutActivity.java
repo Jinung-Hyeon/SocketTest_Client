@@ -18,4 +18,11 @@ public class LogoutActivity extends AppCompatActivity {
         ac.hide();
         Log.e(TAG, "logoutActivity");
     }
+
+    @Override
+    protected void onStop() {
+        Log.e(TAG, "onStop!! 액티비티 종료 ㄱㄱ ");
+        finish();
+        super.onStop();
+    }
 }

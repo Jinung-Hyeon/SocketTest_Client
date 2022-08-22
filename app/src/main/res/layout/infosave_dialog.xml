@@ -40,23 +40,6 @@
             android:cursorVisible="true"
             android:textIsSelectable="true"/>
 
-        <TextView
-            android:layout_gravity="center"
-            android:text="PORT번호를 입력하세요."
-            android:textStyle="bold"
-            android:textSize="20dp"
-            android:layout_width="740px"
-            android:layout_height="0dp"
-            android:layout_weight="0.5"/>
-
-        <EditText
-            android:id="@+id/edt_port"
-            android:hint="port번호를 입력하세요"
-            android:layout_width="760px"
-            android:layout_gravity="center"
-            android:layout_height="0dp"
-            android:layout_weight="1.1"/>
-
         <Button
             android:id="@+id/btn_save"
             android:layout_gravity="center"

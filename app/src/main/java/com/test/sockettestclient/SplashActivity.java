@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.test.sockettestclient.logininfo.CustomDialog;
 import com.test.sockettestclient.logininfo.PreferenceManager;
+import com.test.sockettestclient.worktime.RegistAlarm;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -29,9 +30,17 @@ public class SplashActivity extends AppCompatActivity {
     public static String IP = "";
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e(TAG, "onResume (SplashActivity)");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+
 
         ANDROID_ID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -63,6 +72,11 @@ public class SplashActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            // 알람 인텐트 등록
+            RegistAlarm ra = new RegistAlarm(SplashActivity.this, SplashActivity.this);
+            ra.RegistSleepAlarm();
+            ra.RegistWakeUpAlarm();
+
             Intent i = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(i);
             finish();

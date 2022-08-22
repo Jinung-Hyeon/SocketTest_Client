@@ -1,8 +1,5 @@
 package com.test.sockettestclient;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -21,13 +18,10 @@ import com.test.sockettestclient.retrofit.UpdateCheckThread;
 import com.test.sockettestclient.socket.SocketThread;
 import com.test.sockettestclient.socket.UdpThread;
 import com.test.sockettestclient.worktime.Alarm;
-import com.test.sockettestclient.worktime.GoToSleepAlarm;
 import com.test.sockettestclient.worktime.WorkTime;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Locale;
 
 
@@ -121,52 +115,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         //Log.e(TAG, "ANDROIDID : " + ANDROID_ID);
 
 
-        // 화면 절전 모드 해제
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // 화면 켜기
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         ActionBar ac = getSupportActionBar();
         //ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");
         ac.hide();
-
-
-        // 알람 브로드캐스트 리시버에서 intent로 넘어오면 intent값을 받아서 처리리
-        Intent intent = getIntent();
-        String wakeUpValue = intent.getStringExtra("KeepScreenOn");
-        String goToSleepValue = intent.getStringExtra("ScreenOff");
-        Log.e(TAG, "wakeUpValue : " + wakeUpValue + ", goToSleepValue : " + goToSleepValue);
-
-
-
-        if (goToSleepValue != null){ // 일과 시간 종료 알람 받고 넘오면 처리할 조건문. 화면 절전 모드 진입 시키고 5분뒤 TV꺼짐
-            if (goToSleepValue.equals("ScreenOff")) {
-                // 화면 절전 모드 진입
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                Toast.makeText(this, "잠시 후 화면이 종료됩니다.", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "잠시 후 화면이 종료됩니다.");
-            }
-        } else if (wakeUpValue != null){
-            if (wakeUpValue.equals("KeepScreenOn")) {
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                Log.e(TAG, "화면 계속 켜기 ON!");
-            }
-        } else if (wakeUpValue == null && goToSleepValue == null) { // 앱이 잘못 실행되어 시작, 종료 값이 없을때를 대비해 만든 조건문.
-            Intent sendGoToSleepAlarmIntent = new Intent(this, GoToSleepAlarm.class);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-            if(workTime.finishWorkTime().before(Calendar.getInstance())){
-                workTime.finishWorkTime().add(Calendar.DATE, 1);
-            }
-
-            Log.e(TAG, "GoToSleep 알람 예약!!! 꺼짐 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()) + " || 현재시간 : " + dateFormat.format(System.currentTimeMillis()));
-            PendingIntent goToSleepPendingIntent = PendingIntent.getBroadcast(this, 0, sendGoToSleepAlarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager goToSleepAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            AlarmManager.AlarmClockInfo goToSleepAc = new AlarmManager.AlarmClockInfo(workTime.finishWorkTime().getTimeInMillis(), goToSleepPendingIntent);
-            goToSleepAlarmManager.setAlarmClock(goToSleepAc, goToSleepPendingIntent);
-
-
-
-        }
-
+        
     }
 
     // TTS 엔진 세팅되었을때 동작.
@@ -248,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 mainTts.shutdown();
                 playImageStop = false;
                 requestServerStop = false;
+                finish();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -311,8 +267,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         mainTts.shutdown();
         playImageStop = false;
         requestServerStop = false;
-        super.onDestroy();
         Log.e(TAG, "onDestroy");
+        super.onDestroy();
     }
 
 

@@ -45,10 +45,10 @@ public class UpdateCheckThread extends Thread {
                         .enqueue(new Callback<ObjectResult>() {
                             @Override
                             public void onResponse(Call<ObjectResult> call, Response<ObjectResult> response) {
-//                        if(!response.isSuccessful()){
-//                            textViewResult.setText("code : " + response.code());
-//                            return;
-//                        }
+                        if(!response.isSuccessful()){
+                            Log.e(TAG, "code : " + response.code() + " (UpdateCheckThread.class)");
+                            return;
+                        }
 
                                 ObjectResult objectResults = response.body();
                                 contentsResultList = objectResults.contents;
@@ -72,7 +72,7 @@ public class UpdateCheckThread extends Thread {
                             @Override
                             public void onFailure(Call<ObjectResult> call, Throwable t) {
                                 //textViewResult.setText(t.getMessage());
-                                Log.d("msg", t.toString());
+                                Log.d("msg", t.toString() + " (UpdateCheckThread.class)");
                             }
 
                         });

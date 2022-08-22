@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".SplashActivity">
 
-    <FrameLayout
+    <!--<FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,6 +16,13 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="Splash Activity"/>
-    </FrameLayout>
+    </FrameLayout>-->
+
+    <ImageView
+        android:id="@+id/spalsh_acitivy_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/img1"/>
 
 </RelativeLayout>
