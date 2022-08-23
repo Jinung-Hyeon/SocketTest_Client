@@ -3,14 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.test.sockettestclient">
 
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
@@ -31,9 +29,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SocketTestClient"
-        tools:ignore="MissingTvBanner"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:ignore="MissingTvBanner">
+        <activity
+            android:name=".LogoutActivity"
+            android:exported="true" />
 
+        <receiver
+            android:name=".worktime.Alarm"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".worktime.GoToSleepAlarm"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
+            android:name=".worktime.WakeUpAlarm"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:noHistory="true"/>
     </application>
 
 </manifest>

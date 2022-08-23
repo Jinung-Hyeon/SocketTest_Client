@@ -10,7 +10,7 @@ public class WorkTime {
     private final int WAKEUP_MILISECOND = 0;
 
     //화면 끌 시간 변수
-    private final int GOTOSLEEP_HOUR = 17;
+    private final int GOTOSLEEP_HOUR = 21;
     private final int GOTOSLEEP_MINIUTE = 24;
     private final int GOTOSLEEP_SECOND = 0;
     private final int GOTOSLEEP_MILISECOND = 0;

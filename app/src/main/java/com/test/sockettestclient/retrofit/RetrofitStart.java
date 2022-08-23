@@ -1,7 +1,7 @@
 package com.test.sockettestclient.retrofit;
 
+import static com.test.sockettestclient.LoginActivity.ANDROID_ID;
 import static com.test.sockettestclient.MainActivity.playImageStop;
-import static com.test.sockettestclient.SplashActivity.ANDROID_ID;
 import static com.test.sockettestclient.constant.Constants.IMAGE_URL;
 
 import android.app.Activity;
@@ -56,11 +56,11 @@ public class RetrofitStart{
     public void startRetrofit(){
         try {
             RetrofitService retrofitService = RetrofitFactory.create();
-            retrofitService.getPosts(ANDROID_ID)
+            retrofitService.getPost(ANDROID_ID, 87)
                     .enqueue(new Callback<ObjectResult>() {
                         @Override
                         public void onResponse(Call<ObjectResult> call, Response<ObjectResult> response) {
-                        if(!response.isSuccessful()){
+                        if(!response.isSuccessful()){ // 서버 요청 실패시
                             Log.e(TAG, "code : " + response.code());
                             playImage = new PlayImage();
                             playImage.start();
@@ -69,6 +69,7 @@ public class RetrofitStart{
 
                             ObjectResult objectResults = response.body();
                             contentsResultList = objectResults.contents;
+                            Log.e(TAG, "ddfadf: " + objectResults.contents.toString());
 
                             Log.e(TAG, "서버 요청 성공 (RetrofitStart.class)");
                             //Log.d("msg", objectResults.toString());

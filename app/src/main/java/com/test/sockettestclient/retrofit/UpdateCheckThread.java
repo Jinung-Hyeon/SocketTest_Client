@@ -1,8 +1,8 @@
 package com.test.sockettestclient.retrofit;
 
+import static com.test.sockettestclient.LoginActivity.ANDROID_ID;
 import static com.test.sockettestclient.MainActivity.playImageStop;
 import static com.test.sockettestclient.MainActivity.requestServerStop;
-import static com.test.sockettestclient.SplashActivity.ANDROID_ID;
 
 import android.content.Context;
 import android.util.Log;
@@ -35,13 +35,8 @@ public class UpdateCheckThread extends Thread {
     public void run() {
         while (requestServerStop){
             try {
-                Thread.sleep(5 * 6 * 10 * 1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            try {
                 RetrofitService retrofitService = RetrofitFactory.create();
-                retrofitService.getPosts(ANDROID_ID)
+                retrofitService.getPost(ANDROID_ID, 87)
                         .enqueue(new Callback<ObjectResult>() {
                             @Override
                             public void onResponse(Call<ObjectResult> call, Response<ObjectResult> response) {
@@ -76,7 +71,11 @@ public class UpdateCheckThread extends Thread {
                             }
 
                         });
-
+                try {
+                    Thread.sleep(5 * 6 * 10 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } catch (Exception e) {
 
             }

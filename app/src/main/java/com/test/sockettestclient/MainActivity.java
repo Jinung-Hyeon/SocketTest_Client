@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private final String TAG = "AlarmTest";
 
     // 고유 식별자 - 디바이스 ANDROID_ID 사용 (SplashActivity 에서 생성한 아이디값 사용)
-    public String ANDROID_ID = SplashActivity.ANDROID_ID;
+    public String ANDROID_ID = LoginActivity.ANDROID_ID;
 
     // PlayImage 스레드와 서버요청 스레드를 중지 시키기 위한 토글 변수
     public static boolean playImageStop = true;
@@ -77,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         } else if (System.currentTimeMillis() < workTime.startWorkTime().getTimeInMillis()) { // 현재시간 < 일과시작시간 -> 일과 시작전 동작 조건문 : 화면 계속 켜기나 소켓통신을 하지않음
             Log.e(TAG, "업무시간이 아닙니다. (일과시작전 조건문)");
         } else if(System.currentTimeMillis() < workTime.finishWorkTime().getTimeInMillis()){ // 현재시간 > 일과종료시간  -> 일과시간이니 화면계속켜기나 소켓통신을 계속 해야함
+            // 화면 켜기
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
             // 화면 절전 모드 해제
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             Log.e(TAG, "화면 계속 켜기 ON! (MainActivity - onResume)");
@@ -113,10 +116,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         imageView = findViewById(R.id.imageView);
         //Log.e(TAG, "ANDROIDID : " + ANDROID_ID);
-
-
-        // 화면 켜기
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         ActionBar ac = getSupportActionBar();
         //ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");

@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.test.sockettestclient.MainActivity;
 import com.test.sockettestclient.R;
-import com.test.sockettestclient.SplashActivity;
+import com.test.sockettestclient.LoginActivity;
 
 public class InfoSaveDialog extends Dialog {
 
@@ -45,7 +45,7 @@ public class InfoSaveDialog extends Dialog {
             public void onClick(View v) {
                 if(ip_text.length() == 0 || port_text.length() == 0) {
                     PreferenceManager.setIpString(getContext(), "ip", edt_ip.getText().toString());
-                    SplashActivity.IP = edt_ip.getText().toString();
+                    LoginActivity.IP = edt_ip.getText().toString();
                     Log.e("msg", "저장된 정보 : ip = " + ip_text);
                     dismiss();
 
