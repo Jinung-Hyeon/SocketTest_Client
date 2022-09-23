@@ -3,6 +3,7 @@ package com.test.sockettestclient.retrofit;
 import static com.test.sockettestclient.LoginActivity.ANDROID_ID;
 import static com.test.sockettestclient.MainActivity.playImageStop;
 import static com.test.sockettestclient.MainActivity.requestServerStop;
+import static com.test.sockettestclient.constant.Constants.BASE_URL;
 
 import android.content.Context;
 import android.util.Log;
@@ -35,7 +36,7 @@ public class UpdateCheckThread extends Thread {
     public void run() {
         while (requestServerStop){
             try {
-                RetrofitService retrofitService = RetrofitFactory.create();
+                com.test.sockettestclient.retrofit.RetrofitService retrofitService = com.test.sockettestclient.retrofit.RetrofitFactory.create(BASE_URL);
                 retrofitService.getPost(ANDROID_ID, 87)
                         .enqueue(new Callback<ObjectResult>() {
                             @Override
@@ -67,12 +68,12 @@ public class UpdateCheckThread extends Thread {
                             @Override
                             public void onFailure(Call<ObjectResult> call, Throwable t) {
                                 //textViewResult.setText(t.getMessage());
-                                Log.d("msg", t.toString() + " (UpdateCheckThread.class)");
+                                Log.d("msg", t.toString());
                             }
 
                         });
                 try {
-                    Thread.sleep(5 * 6 * 10 * 1000);
+                    Thread.sleep(30 * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

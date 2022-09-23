@@ -15,13 +15,13 @@ public class RegistAlarm {
 
     private final String TAG = "AlarmTest";
 
-    private WorkTime workTime = new WorkTime();
+    private com.test.sockettestclient.worktime.WorkTime workTime = new com.test.sockettestclient.worktime.WorkTime();
 
     private Context mContext;
     private Activity mActivity;
     private Calendar sleep, wake;
 
-    public RegistAlarm (Context context, Activity activity) {
+    public RegistAlarm(Context context, Activity activity) {
         this.mContext = context;
         this.mActivity = activity;
     }

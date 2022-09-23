@@ -12,6 +12,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tv_infoSave"
             android:text="정보입력"
             android:textAlignment="center"
             android:textSize="40dp"
@@ -19,24 +20,34 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.8"
+            android:layout_weight="1.5"
             android:textColor="@color/black"/>
         <TextView
+            android:id="@+id/tv_andId"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:textStyle="bold"
+            android:text="ANDROID_ID"
+            android:gravity="center"/>
+
+        <TextView
             android:layout_gravity="center"
-            android:text="IP를 입력하세요."
+            android:text="도메인 주소를 입력하세요."
             android:textStyle="bold"
             android:textSize="20dp"
             android:layout_width="740px"
+            android:gravity="bottom"
             android:layout_height="0dp"
-            android:layout_weight="0.5"/>
+            android:layout_weight="0.8"/>
 
         <EditText
             android:id="@+id/edt_ip"
             android:layout_width="760px"
             android:layout_height="0dp"
             android:layout_gravity="center"
-            android:layout_weight="1.1"
-            android:hint="ip를 입력하세요"
+            android:layout_weight="0.9"
+            android:hint="ex)https://..."
             android:cursorVisible="true"
             android:textIsSelectable="true"/>
 

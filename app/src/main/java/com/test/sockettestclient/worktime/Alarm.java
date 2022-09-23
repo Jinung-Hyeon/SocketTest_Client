@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 public class Alarm extends BroadcastReceiver {
     private static final String TAG = "AlarmTest";
     private Intent i;
-    private WorkTime workTime;
+    private com.test.sockettestclient.worktime.WorkTime workTime;
 
 
 
@@ -23,7 +23,7 @@ public class Alarm extends BroadcastReceiver {
 
         i = new Intent(context, MainActivity.class);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        workTime = new WorkTime();
+        workTime = new com.test.sockettestclient.worktime.WorkTime();
 
         if(action != null) {
             switch (action) {
@@ -36,7 +36,8 @@ public class Alarm extends BroadcastReceiver {
                     if (System.currentTimeMillis() < workTime.finishWorkTime().getTimeInMillis()){
                         Log.e(TAG, "현재 시간 : " + dateFormat.format(System.currentTimeMillis()) + " 종료 예약 시간 : " + dateFormat.format(workTime.finishWorkTime().getTimeInMillis()));
                         Log.e(TAG, "아직 일과 종료시간 전입니다. 다시 화면을 실행합니다.");
-                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        i.putExtra("turnOn","turnOn");
+                        i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         context.startActivity(i);
                     }
                     break;

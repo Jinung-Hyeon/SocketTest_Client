@@ -2,6 +2,7 @@ package com.test.sockettestclient.retrofit;
 
 import static com.test.sockettestclient.LoginActivity.ANDROID_ID;
 import static com.test.sockettestclient.MainActivity.playImageStop;
+import static com.test.sockettestclient.constant.Constants.BASE_URL;
 import static com.test.sockettestclient.constant.Constants.IMAGE_URL;
 
 import android.app.Activity;
@@ -55,7 +56,7 @@ public class RetrofitStart{
 
     public void startRetrofit(){
         try {
-            RetrofitService retrofitService = RetrofitFactory.create();
+            com.test.sockettestclient.retrofit.RetrofitService retrofitService = com.test.sockettestclient.retrofit.RetrofitFactory.create(BASE_URL);
             retrofitService.getPost(ANDROID_ID, 87)
                     .enqueue(new Callback<ObjectResult>() {
                         @Override
@@ -69,7 +70,6 @@ public class RetrofitStart{
 
                             ObjectResult objectResults = response.body();
                             contentsResultList = objectResults.contents;
-                            Log.e(TAG, "ddfadf: " + objectResults.contents.toString());
 
                             Log.e(TAG, "서버 요청 성공 (RetrofitStart.class)");
                             //Log.d("msg", objectResults.toString());
@@ -86,13 +86,13 @@ public class RetrofitStart{
                         @Override
                         public void onFailure(Call<ObjectResult> call, Throwable t) {
                             //textViewResult.setText(t.getMessage());
-                            Log.d("msg", t.toString());
+                            Log.e("AlarmTest", "레트로핏 연결실패 메시지 : " + t.toString());
                         }
 
                     });
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

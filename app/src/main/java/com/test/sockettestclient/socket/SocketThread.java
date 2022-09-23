@@ -80,12 +80,12 @@ public class SocketThread extends Thread{
 
         try {
             for (int i = 0; i < mApps.size(); i++) {
-                if(mApps.get(i).activityInfo.packageName.startsWith("com.test.sokettestserver")){
+                if(mApps.get(i).activityInfo.packageName.startsWith("com.smsoft.lifesupporter_watchdog")){
                     Log.d(TAG, "실행시킴");
                     break;
                 }
             }
-            Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.test.sokettestserver");
+            Intent intent = mContext.getPackageManager().getLaunchIntentForPackage("com.smsoft.lifesupporter_watchdog");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
         }

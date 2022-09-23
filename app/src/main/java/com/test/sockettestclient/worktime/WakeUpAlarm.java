@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.test.sockettestclient.LoginActivity;
+
 public class WakeUpAlarm extends BroadcastReceiver {
 
     private static final String TAG = "AlarmTest";

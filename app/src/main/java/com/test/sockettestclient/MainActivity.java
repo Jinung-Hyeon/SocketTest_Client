@@ -120,7 +120,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         ActionBar ac = getSupportActionBar();
         //ac.setTitle("2022년 지역 SW서비스사업화 사업 [지역현안해결형 SW개발]");
         ac.hide();
-        
+
+
+
     }
 
     // TTS 엔진 세팅되었을때 동작.
@@ -135,11 +137,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 Log.e("TTS", "This Language is not supported");
             }
 
-            updateCheckThread = new UpdateCheckThread(this);
-            updateCheckThread.start();
+            Intent intent = getIntent();
+            String intentValue = intent.getStringExtra("turnOn");
+            Log.e(TAG, "intentValue : " + intentValue );
+            if (intentValue == null){
+                updateCheckThread = new UpdateCheckThread(this);
+                updateCheckThread.start();
 
-            retrofitStart = new RetrofitStart(this, this, mainTts);
-            retrofitStart.startRetrofit();
+                retrofitStart = new RetrofitStart(this, this, mainTts);
+                retrofitStart.startRetrofit();
+            }
 
 
 
@@ -203,11 +210,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 playImageStop = false;
                 requestServerStop = false;
                 finish();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 
     @Override
     public boolean moveTaskToBack(boolean nonRoot) {
@@ -235,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 udpThread = new UdpThread();
                 udpThread.start();
                 socketthread.socket.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             backKeyPressedTime = System.currentTimeMillis();
@@ -260,15 +270,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
 
-    @Override
-    protected void onDestroy() {
-        mainTts.stop();
-        mainTts.shutdown();
-        playImageStop = false;
-        requestServerStop = false;
-        Log.e(TAG, "onDestroy");
-        super.onDestroy();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        mainTts.stop();
+//        mainTts.shutdown();
+//        playImageStop = false;
+//        requestServerStop = false;
+//        super.onDestroy();
+//        Log.e(TAG, "onDestroy");
+//    }
 
 
 
